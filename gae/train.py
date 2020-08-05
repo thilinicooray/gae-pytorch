@@ -45,8 +45,8 @@ def gae_for(args):
     # adj_label = sparse_to_tuple(adj_label)
     adj_label = torch.FloatTensor(adj_label.toarray())
 
-    pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
-    norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
+    pos_weight = torch.FloatTensor(float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum())
+    norm = torch.FloatTensor(adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2))
 
     model = GCNModelVAE(feat_dim, args.hidden1, args.hidden2, args.dropout)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
