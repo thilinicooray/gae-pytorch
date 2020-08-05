@@ -56,15 +56,15 @@ def gae_for(args):
         t = time.time()
         model.train()
         optimizer.zero_grad()
-        recovered, z, mu, logvar = model(features, adj_norm)
+        recovered, z, mu, logvar, grouped_mu, grouped_logvar= model(features, adj_norm)
         loss = loss_function(preds=recovered, labels=adj_label,
-                             mu=mu, logvar=logvar, n_nodes=n_nodes,
+                             mu=mu, logvar=logvar, grouped_mu=grouped_mu, grouped_logvar=grouped_logvar, n_nodes=n_nodes,
                              norm=norm, pos_weight=pos_weight)
         loss.backward()
         cur_loss = loss.item()
         optimizer.step()
 
-        hidden_emb = z.data.numpy()
+        hidden_emb = mu.data.numpy()
         roc_curr, ap_curr = get_roc_score(hidden_emb, adj_orig, val_edges, val_edges_false)
 
         print("Epoch:", '%04d' % (epoch + 1), "train_loss=", "{:.5f}".format(cur_loss),

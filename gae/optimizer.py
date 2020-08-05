@@ -3,7 +3,7 @@ import torch.nn.modules.loss
 import torch.nn.functional as F
 
 
-def loss_function(preds, labels, mu, logvar, n_nodes, norm, pos_weight):
+def loss_function(preds, labels, mu, logvar, grouped_mu, grouped_logvar, n_nodes, norm, pos_weight):
     cost = norm * F.binary_cross_entropy_with_logits(preds, labels, pos_weight=pos_weight)
 
     # see Appendix B from VAE paper:
@@ -13,7 +13,10 @@ def loss_function(preds, labels, mu, logvar, n_nodes, norm, pos_weight):
     KLD = -0.5 / n_nodes * torch.mean(torch.sum(
         1 + 2 * logvar - mu.pow(2) - logvar.exp().pow(2), 1))
 
+    KLD_g = -0.5 / n_nodes * torch.mean(torch.sum(
+        1 + 2 * grouped_logvar - grouped_mu.pow(2) - grouped_logvar.exp().pow(2), 1))
 
-    print (cost, KLD)
 
-    return cost + KLD
+    print (cost, KLD, KLD_g)
+
+    return cost + KLD + KLD_g
