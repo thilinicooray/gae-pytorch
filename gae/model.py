@@ -126,7 +126,7 @@ class GCNModelVAE(nn.Module):
         batch = torch.ones(clz_mu.size(0)).cuda()
 
         grouped_mu, grouped_logvar = accumulate_group_evidence(
-            clz_mu.data, clz_logvar.data, batch, True
+            clz_mu.data, clz_logvar.data, batch, False
         )
 
         class_latent_embeddings = group_wise_reparameterize(
