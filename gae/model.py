@@ -130,7 +130,7 @@ class GCNModelVAE(nn.Module):
         )
 
         class_latent_embeddings = group_wise_reparameterize(
-            training=True, mu=grouped_mu, logvar=grouped_logvar, labels_batch=batch, cuda=True
+            training=True, mu=grouped_mu, logvar=grouped_logvar, labels_batch=batch, cuda=False
         )
 
         updated_z = self.linear(torch.cat([z,class_latent_embeddings], -1))
