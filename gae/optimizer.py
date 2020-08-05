@@ -5,9 +5,7 @@ import torch.nn.functional as F
 
 def loss_function(preds, labels, mu, logvar, grouped_mu, grouped_logvar, n_nodes, norm, pos_weight):
 
-    print(preds.size(), labels.size(), norm, pos_weight.size())
-
-    cost = norm * F.binary_cross_entropy_with_logits(preds, labels, pos_weight=pos_weight)
+    cost = F.binary_cross_entropy_with_logits(preds, labels)
 
     # see Appendix B from VAE paper:
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
@@ -20,6 +18,6 @@ def loss_function(preds, labels, mu, logvar, grouped_mu, grouped_logvar, n_nodes
         1 + 2 * grouped_logvar - grouped_mu.pow(2) - grouped_logvar.exp().pow(2), 1))
 
 
-    print (cost, KLD, KLD_g)
+    #print (cost, KLD, KLD_g)
 
     return cost + KLD + KLD_g
