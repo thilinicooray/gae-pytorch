@@ -9,9 +9,9 @@ import scipy.sparse as sp
 import torch
 from torch import optim
 
-from model import GCNModelVAE
-from optimizer import loss_function
-from utils import load_data, mask_test_edges, preprocess_graph, get_roc_score
+from gae.model import GCNModelVAE
+from gae.optimizer import loss_function
+from gae.utils import load_data, mask_test_edges, preprocess_graph, get_roc_score
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, default='gcn_vae', help="models used")
@@ -45,7 +45,7 @@ def gae_for(args):
     # adj_label = sparse_to_tuple(adj_label)
     adj_label = torch.FloatTensor(adj_label.toarray())
 
-    pos_weight = torch.Tensor([float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()])
+    pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
     norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
 
     model = GCNModelVAE(feat_dim, args.hidden1, args.hidden2, args.dropout)
@@ -56,9 +56,9 @@ def gae_for(args):
         t = time.time()
         model.train()
         optimizer.zero_grad()
-        recovered, z, mu, logvar, grouped_mu, grouped_logvar= model(features, adj_norm)
+        recovered, mu, logvar = model(features, adj_norm)
         loss = loss_function(preds=recovered, labels=adj_label,
-                             mu=mu, logvar=logvar, grouped_mu=grouped_mu, grouped_logvar=grouped_logvar, n_nodes=n_nodes,
+                             mu=mu, logvar=logvar, n_nodes=n_nodes,
                              norm=norm, pos_weight=pos_weight)
         loss.backward()
         cur_loss = loss.item()
